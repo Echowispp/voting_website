@@ -1,0 +1,9 @@
+img {
+    width:200px;
+}
+body {
+    text-align:center;
+    font-family:Georgia;
+    background:rgb(100, 255, 255);
+    color:purple; 
+}

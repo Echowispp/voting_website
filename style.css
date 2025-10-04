@@ -4,6 +4,12 @@ img {
 body {
   text-align: center;
   font-family: Georgia;
-  background: rgb(100, 255, 255);
-  color: purple;
+  background: #ffffff;
+  color: rgb(110, 150, 200);
+  font-size: 15px;
+}
+.button {
+  position: absolute;
+  bottom: 50;
+  left: 800px;
 }

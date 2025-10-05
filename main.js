@@ -6,8 +6,6 @@ const SUPABASE_KEY =
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-console.log("Chart.js version:", Chart?.version);
-
 //sets a max # of times a user can vote
 
 const maxVotes = 5;
@@ -22,8 +20,6 @@ let candidate4 = 0;
 
 // need these for the graph, the value is assigned later in the case of voteGraph
 let voteGraph;
-const xValues = ["Candidate 1", "Candidate 2", "Candidate 3", "Candidate 4"];
-let yValues = [candidate1, candidate2, candidate3, candidate4];
 
 //cookie functions
 
@@ -121,14 +117,26 @@ async function updateVoteInDB(candidateID, newCount) {
 //bar graph functions
 
 function updateGraph() {
-  //const xValues = ["Candidate 1", "Candidate 2", "Candidate 3", "Candidate 4"]; const yValues = [candidate1, candidate2, candidate3, candidate4];if (voteGraph) {voteGraph.destroy();}
-
   const canvas = document.getElementById("voteChart");
   if (!canvas) {
     console.warn("Canvas element not found - skipping chart update");
     return;
   }
-
+  const xValues = ["Candidate 1", "Candidate 2", "Candidate 3", "Candidate 4"];
+  const yValues = [
+    Number(candidate1 || 0),
+    Number(candidate2 || 0),
+    Number(candidate3 || 0),
+    Number(candidate4 || 0),
+  ];
+  console.log(
+    "updateGraph() — candidates:",
+    candidate1,
+    candidate2,
+    candidate3,
+    candidate4
+  );
+  console.log("updateGraph() — yValues:", yValues);
   const ctx = canvas.getContext("2d");
   console.log(
     "Rendering chart with:",
@@ -137,11 +145,12 @@ function updateGraph() {
     candidate3,
     candidate4
   );
-
   if (voteGraph) {
-    voteGraph.destroy();
+    voteGraph.data.labels = xValues;
+    voteGraph.data.datasets[0].data = yValues;
+    voteGraph.update();
+    return;
   }
-
   voteGraph = new Chart(ctx, {
     type: "bar",
     data: {

@@ -8,20 +8,31 @@
   <body>
     <h1>Help me decide what project to do for the next week in #siege!</h1>
 
-    <div>
+    <div class="votesElements">
       <p>
         Candidate 1: <span class="cand1_value">0</span> Candidate 2:
         <span class="cand2_value">0</span>
       </p>
-      <button class="voteButton cand1_add" type="button">Vote for cand1</button>
-      <button class="voteButton cand2_add" type="button">Vote for cand2</button>
+      <button class="voteButton cand1_add" type="button">
+        Aerial-only platformer; the player must use walljumps, dashes and such
+        to move around
+      </button>
+      <button class="voteButton cand2_add" type="button">
+        Generative climber; procedurally generated parkour, a take on those
+        kinds usually mobile games, maybe with the walls-only mechanic
+      </button>
 
       <p>
         Candidate 3: <span class="cand3_value">0</span> Candidate 4:
         <span class="cand4_value">0</span>
       </p>
-      <button class="voteButton cand3_add" type="button">Vote for cand3</button>
-      <button class="voteButton cand4_add" type="button">Vote for cand4</button>
+      <button class="voteButton cand3_add" type="button">
+        Narrative-focused maybe graphic novella; probably multiple endings
+      </button>
+      <button class="voteButton cand4_add" type="button">
+        Rubik's cube sim; might be too small of a project to really fill the
+        10h, I'll see what to do if needed
+      </button>
     </div>
 
     <p>Remaining votes: <span class="votesDisplay">5</span></p>
@@ -49,12 +60,7 @@
 
     <canvas
       id="voteChart"
-      style="
-        width: 100%;
-        max-width: 700px;
-        max-height: 500px;
-        border: 1px solid red;
-      "
+      style="width: 100%; max-width: 700px; max-height: 500px"
     ></canvas>
 
     <script src="main.js"></script>

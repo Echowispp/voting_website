@@ -32,3 +32,19 @@ body {
 .voteButton:active {
   background-color: #8080aa;
 }
+
+.votingInfo {
+  position: fixed;
+  top: 315px;
+  left: 730px;
+  text-align: left;
+  border: 3px solid #8080aa;
+  border-radius: 8px;
+  padding: 5px;
+}
+
+.barGraph {
+  position: fixed;
+  top: 500px;
+  left: 200px;
+}

@@ -6,15 +6,71 @@ const SUPABASE_KEY =
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+console.log("Chart.js version:", Chart?.version);
+
 //sets a max # of times a user can vote
+
 const maxVotes = 5;
 let votesLeft = maxVotes;
+const barColors = ["#8080aa", "#a0a0cf", "#313190", "#8080ff"];
 
 // classes related to these are written as "cand#"
 let candidate1 = 0;
 let candidate2 = 0;
 let candidate3 = 0;
 let candidate4 = 0;
+
+// need these for the graph, the value is assigned later in the case of voteGraph
+let voteGraph;
+const xValues = ["Candidate 1", "Candidate 2", "Candidate 3", "Candidate 4"];
+let yValues = [candidate1, candidate2, candidate3, candidate4];
+
+//cookie functions
+
+function setCookie(name, value, days) {
+  const date = new Date();
+  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+  const expires = "expires=" + date.toUTCString();
+  document.cookie = name + "=" + value + ";" + expires + ";path=/";
+}
+
+function getCookie(name) {
+  const nameEQ = name + "=";
+  const cookies = document.cookie.split(";");
+  for (let i = 0; i < cookies.length; i = i + 1) {
+    let cookie = cookies[i].trim();
+    if (cookie.indexOf(nameEQ) === 0) {
+      return cookie.substring(nameEQ.length);
+    }
+  }
+  return null;
+}
+
+function initializeCookiesLeft() {
+  const savedVotes = getCookie("cookieVotes");
+  if (savedVotes !== null) {
+    votesLeft = parseInt(savedVotes);
+    console.log("Loaded votes from cookie", votesLeft);
+  } else {
+    votesLeft = maxVotes;
+    setCookie("cookieVotes", votesLeft, 30);
+    console.log("Made new cookie, changing votes to", votesLeft);
+  }
+  updateVotesDisplay();
+}
+
+//subabase syncing functions (constants at the top)
+
+function updateVotesDisplay() {
+  const display = document.querySelector(".votesDisplay");
+  if (display) {
+    display.innerText = votesLeft;
+  }
+}
+
+function saveVotesToCookie() {
+  setCookie("cookieVotes", votesLeft, 30);
+}
 
 async function loadVotes() {
   const { data, error } = await supabase.from("votes").select("*").order("id");
@@ -25,6 +81,7 @@ async function loadVotes() {
     candidate3 = data[2].vote_count;
     candidate4 = data[3].vote_count;
     updateAllDisplays();
+    updateGraph();
   }
 }
 
@@ -54,8 +111,69 @@ async function updateVoteInDB(candidateID, newCount) {
     .eq("id", candidateID);
 
   if (error) {
-    console.error("Error updating vote", error);
+    console.error(
+      "Error updating vote, refreshing should fix it and get your vote back",
+      error
+    );
   }
+}
+
+//bar graph functions
+
+function updateGraph() {
+  //const xValues = ["Candidate 1", "Candidate 2", "Candidate 3", "Candidate 4"]; const yValues = [candidate1, candidate2, candidate3, candidate4];if (voteGraph) {voteGraph.destroy();}
+
+  const canvas = document.getElementById("voteChart");
+  if (!canvas) {
+    console.warn("Canvas element not found - skipping chart update");
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
+  console.log(
+    "Rendering chart with:",
+    candidate1,
+    candidate2,
+    candidate3,
+    candidate4
+  );
+
+  if (voteGraph) {
+    voteGraph.destroy();
+  }
+
+  voteGraph = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: xValues,
+      datasets: [
+        {
+          backgroundColor: barColors,
+          data: yValues,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true, // Start y-axis at 0
+          ticks: {
+            stepSize: 1, // Show whole numbers only
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          display: false, // Hide the legend since we only have one dataset
+        },
+        title: {
+          display: true,
+          text: "Vote Distribution",
+        },
+      },
+    },
+  });
 }
 
 //Functions for cand1 below
@@ -65,11 +183,13 @@ function update1() {
 }
 
 async function addVote1() {
-  if (votesLeft >= 1) {
+  if (votesLeft > 0) {
     votesLeft = votesLeft - 1;
     candidate1 = candidate1 + 1;
     update1();
     await updateVoteInDB(1, candidate1);
+    saveVotesToCookie();
+    updateVotesDisplay();
   } else {
     alert(`You've voted your maximum of ${maxVotes} times`);
   }
@@ -83,11 +203,13 @@ function update2() {
 }
 
 async function addVote2() {
-  if (votesLeft >= 1) {
+  if (votesLeft > 0) {
     votesLeft = votesLeft - 1;
     candidate2 = candidate2 + 1;
     update2();
     await updateVoteInDB(2, candidate2);
+    saveVotesToCookie();
+    updateVotesDisplay();
   } else {
     alert(`You've voted your maximum of ${maxVotes} times`);
   }
@@ -101,11 +223,13 @@ function update3() {
 }
 
 async function addVote3() {
-  if (votesLeft >= 1) {
+  if (votesLeft > 0) {
     votesLeft = votesLeft - 1;
     candidate3 = candidate3 + 1;
     update3();
     await updateVoteInDB(3, candidate3);
+    saveVotesToCookie();
+    updateVotesDisplay();
   } else {
     alert(`You've voted your maximum of ${maxVotes} times`);
   }
@@ -119,15 +243,18 @@ function update4() {
 }
 
 async function addVote4() {
-  if (votesLeft >= 1) {
+  if (votesLeft > 0) {
     votesLeft = votesLeft - 1;
     candidate4 = candidate4 + 1;
     update4();
     await updateVoteInDB(4, candidate4);
+    saveVotesToCookie();
+    updateVotesDisplay();
   } else {
     alert(`You've voted your maximum of ${maxVotes} times`);
   }
 }
 document.querySelector(".cand4_add").onclick = addVote4;
 
+initializeCookiesLeft();
 loadVotes();

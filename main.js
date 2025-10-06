@@ -122,7 +122,12 @@ function updateGraph() {
     console.warn("Canvas element not found - skipping chart update");
     return;
   }
-  const xValues = ["Candidate 1", "Candidate 2", "Candidate 3", "Candidate 4"];
+  const xValues = [
+    "Aerial platformer",
+    "Generative climber",
+    "Narrative-focused game",
+    "Rubik's cube sim",
+  ];
   const yValues = [
     Number(candidate1 || 0),
     Number(candidate2 || 0),
